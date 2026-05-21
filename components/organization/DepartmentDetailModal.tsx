@@ -204,7 +204,6 @@ export const DepartmentDetailModal: React.FC<DepartmentDetailModalProps> = ({
                     label="上级部门" 
                     required 
                     value={parentText} 
-                    icon={parentDept ? <CardLinkIcon /> : null} 
                   />
                   <InfoRow label="汇报层级" required value={dept.reportingLevel || 'R1 (R1)'} />
                   <InfoRow label="部门级别" value={dept.deptLevel || 'TM/UM'} />
@@ -212,7 +211,6 @@ export const DepartmentDetailModal: React.FC<DepartmentDetailModalProps> = ({
                     label="成本中心" 
                     required 
                     value={dept.costCenter || 'CI信息系统 (84000)'} 
-                    icon={<CardLinkIcon />} 
                   />
                   <InfoRow label="人事子范围" required value={dept.hrSubarea || '安亭本部-SVW Anting (9001)'} />
                   <InfoRow label="人事范围" required value={dept.hrArea || '上汽大众 (安亭) (0SVW)'} />
