@@ -34,7 +34,9 @@ import {
   List,
   Smartphone,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Upload,
+  ChevronDown
 } from 'lucide-react';
 
 
@@ -200,6 +202,7 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingApp, setEditingApp] = useState<AppItem | null>(null);
+    const [uploadError, setUploadError] = useState<string | null>(null);
     const [formData, setFormData] = useState<Partial<AppItem>>({
         name: '',
         displayName: '',
@@ -212,6 +215,42 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
         isPc: true,
         isMobile: true
     });
+
+    const handleIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadError(null);
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                if (img.width !== 320 || img.height !== 320) {
+                    setUploadError(`图片尺寸为 ${img.width}x${img.height} 像素。必须为 320x320 像素！`);
+                    setFormData(prev => ({ ...prev, iconMedium: undefined, iconSmall: undefined }));
+                } else {
+                    setUploadError(null);
+                    setFormData(prev => ({ 
+                        ...prev, 
+                        iconMedium: event.target?.result as string,
+                        iconSmall: event.target?.result as string
+                    }));
+                }
+            };
+            img.src = event.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleClearUploadedIcon = () => {
+        setUploadError(null);
+        setFormData(prev => ({ 
+            ...prev, 
+            iconMedium: undefined, 
+            iconSmall: undefined 
+        }));
+    };
 
     const categories = ['全部', '核心人事', '办公协作', '产研开发', '系统运维'];
 
@@ -248,6 +287,7 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
 
     const handleAddClick = () => {
         setEditingApp(null);
+        setUploadError(null);
         setFormData({
             name: '',
             displayName: '',
@@ -266,6 +306,7 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
     const handleEditClick = (e: React.MouseEvent, app: AppItem) => {
         e.stopPropagation();
         setEditingApp(app);
+        setUploadError(null);
         setFormData({
             ...app,
             isPc: app.isPc !== false,
@@ -325,18 +366,21 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
                     )}
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm overflow-x-auto no-scrollbar">
-                        {categories.map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => setActiveCategory(cat)}
-                                className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
-                                    activeCategory === cat ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
-                                }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
+                    <div className="relative bg-white rounded-xl border border-gray-200 shadow-sm shrink-0">
+                        <select
+                            value={activeCategory}
+                            onChange={(e) => setActiveCategory(e.target.value)}
+                            className="appearance-none bg-white rounded-xl pl-4 pr-10 py-2.5 text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all min-w-[130px]"
+                        >
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>
+                                    {cat}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <ChevronDown size={16} />
+                        </div>
                     </div>
                     <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm shrink-0 gap-1">
                         <button
@@ -738,6 +782,46 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
                                 </div>
                             </div>
 
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">上传应用图标 (320*320)</label>
+                                <div className="flex items-center gap-6 p-4 bg-gray-50 border border-gray-200 rounded-2xl">
+                                    {formData.iconMedium ? (
+                                        <div className="relative w-16 h-16 rounded-xl border border-gray-200 bg-white overflow-hidden shrink-0 group/icon">
+                                            <img src={formData.iconMedium} alt="Icon Preview" className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={handleClearUploadedIcon}
+                                                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/icon:opacity-100 transition-opacity"
+                                                title="删除图标"
+                                            >
+                                                <Trash2 size={16} className="text-white" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 bg-white flex items-center justify-center shrink-0 text-gray-400">
+                                            <Upload size={20} />
+                                        </div>
+                                    )}
+                                    <div className="flex-1 min-w-0 space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <label className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 transition-all cursor-pointer shadow-sm active:scale-95 inline-block">
+                                                选择文件
+                                                <input 
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleIconUpload}
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                            <span className="text-xs text-gray-400">支持 JPG, PNG，尺寸必须为 320*320 像素</span>
+                                        </div>
+                                        {uploadError && (
+                                            <p className="text-xs font-medium text-red-500 animate-pulse">{uploadError}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="pt-4 flex gap-4 shrink-0">
                                 <button 
                                     type="button"
@@ -748,7 +832,12 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
                                 </button>
                                 <button 
                                     type="submit"
-                                    className="flex-1 py-3 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                                    disabled={!!uploadError}
+                                    className={`flex-1 py-3 text-white rounded-2xl text-sm font-bold transition-all shadow-lg ${
+                                        uploadError 
+                                        ? 'bg-gray-300 shadow-none cursor-not-allowed' 
+                                        : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'
+                                    }`}
                                 >
                                     {editingApp ? '保存修改' : '立即新增'}
                                 </button>

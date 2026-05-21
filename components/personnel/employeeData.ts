@@ -411,5 +411,181 @@ export const MOCK_EMPLOYEE_DETAILS: Record<string, EmployeeDetail> = {
     workHistory: [
       { company: '上汽大众', time: '2015-07 ~ 至今', position: '系统分析员' }
     ]
+  },
+  'root': {
+    id: 'root',
+    name: '徐廷睿',
+    enName: 'Xu Tingrui',
+    dept: 'MP 研发',
+    position: 'MP4负责人',
+    email: 'tingrui.xu@svw.com',
+    phone: '13888880001',
+    phoneShort: '680001',
+    location: '上海总部-安亭',
+    gender: '男',
+    dob: '1982/05/20',
+    ethnicity: '汉族',
+    nativePlace: '浙江杭州',
+    birthplace: '杭州',
+    politicalStatus: '中共党员',
+    maritalStatus: '已婚',
+    startWorkDate: '2005/07/15',
+    title: '部门经理',
+    perf2024: 'A',
+    perf2023: 'A',
+    perf2022: 'A',
+    homeAddress: '上海市杨浦区四平路1239号',
+    education: [
+      { school: '同济大学', major: '车辆工程', degree: '工学硕士', time: '2002/09 - 2005/03' },
+      { school: '同济大学', major: '车辆工程', degree: '工学学士', time: '1998/09 - 2002/07' }
+    ],
+    workHistory: [
+      { company: '上汽大众', time: '2005/08 ~ 至今', position: 'MP4负责人', dept: 'MP 研发' }
+    ]
+  },
+  'child1': {
+    id: 'child1',
+    name: '孙洁',
+    enName: 'Sun Jie',
+    dept: 'MP 研发3',
+    position: 'MP4-3项目经理',
+    email: 'jie.sun@svw.com',
+    phone: '13888880002',
+    phoneShort: '680002',
+    location: '上海总部-安亭',
+    gender: '女',
+    dob: '1988/11/12',
+    ethnicity: '汉族',
+    nativePlace: '江苏南京',
+    birthplace: '南京',
+    politicalStatus: '中共党员',
+    maritalStatus: '已婚',
+    startWorkDate: '2013/07/10',
+    title: '项目经理',
+    perf2024: 'A',
+    perf2023: 'B',
+    perf2022: 'A',
+    education: [
+      { school: '南京大学', major: '工商管理', degree: '管理学学士', time: '2009/09 - 2013/07' }
+    ],
+    workHistory: [
+      { company: '上汽大众', time: '2013/07 ~ 至今', position: 'MP4-3项目经理', dept: 'MP 研发3' }
+    ]
+  },
+  'child2': {
+    id: 'child2',
+    name: '李铭',
+    enName: 'Li Ming',
+    dept: 'MP 研发1',
+    position: 'MP4-1项目经理',
+    email: 'ming.li@svw.com',
+    phone: '13888880003',
+    phoneShort: '680003',
+    location: '上海总部-安亭',
+    gender: '男',
+    dob: '1985/04/18',
+    ethnicity: '汉族',
+    nativePlace: '山东济南',
+    birthplace: '济南',
+    politicalStatus: '群众',
+    maritalStatus: '已婚',
+    startWorkDate: '2010/07/20',
+    title: '项目经理',
+    perf2024: 'B',
+    perf2023: 'A',
+    perf2022: 'A',
+    education: [
+      { school: '山东大学', major: '机械工程', degree: '工学硕士', time: '2007/09 - 2010/07' }
+    ],
+    workHistory: [
+      { company: '上汽大众', time: '2010/07 ~ 至今', position: 'MP4-1项目经理', dept: 'MP 研发1' }
+    ]
+  },
+  'child3': {
+    id: 'child3',
+    name: '岳海文',
+    enName: 'Yue Haiwen',
+    dept: 'MP 研发2',
+    position: 'MP4-2项目经理',
+    email: 'haiwen.yue@svw.com',
+    phone: '13888880004',
+    phoneShort: '680004',
+    location: '上海总部-安亭',
+    gender: '男',
+    dob: '1986/09/30',
+    ethnicity: '汉族',
+    nativePlace: '四川成都',
+    birthplace: '成都',
+    politicalStatus: '中共党员',
+    maritalStatus: '已婚',
+    startWorkDate: '2011/07/05',
+    title: '项目经理',
+    perf2024: 'A',
+    perf2023: 'A',
+    perf2022: 'B',
+    education: [
+      { school: '四川大学', major: '软件工程', degree: '工学硕士', time: '2008/09 - 2011/07' }
+    ],
+    workHistory: [
+      { company: '上汽大众', time: '2011/07 ~ 至今', position: 'MP4-2项目经理', dept: 'MP 研发2' }
+    ]
+  },
+  'g1': {
+    id: 'g1',
+    name: '何泽夏',
+    enName: 'He Zexia',
+    dept: 'MP 研发1',
+    position: 'MP 专业经理',
+    email: 'zexia.he@svw.com',
+    phone: '13888880005',
+    phoneShort: '680005',
+    location: '上海总部-安亭',
+    gender: '男',
+    dob: '1990/08/15',
+    ethnicity: '汉族',
+    nativePlace: '安徽合肥',
+    birthplace: '合肥',
+    politicalStatus: '群众',
+    maritalStatus: '未婚',
+    startWorkDate: '2015/07/12',
+    title: '专业经理',
+    perf2024: 'B',
+    perf2023: 'B',
+    perf2022: 'A',
+    education: [
+      { school: '中国科学技术大学', major: '控制科学与工程', degree: '工学硕士', time: '2012/09 - 2015/07' }
+    ],
+    workHistory: [
+      { company: '上汽大众', time: '2015/07 ~ 至今', position: 'MP 专业经理', dept: 'MP 研发1' }
+    ]
+  },
+  'g2': {
+    id: 'g2',
+    name: '贾为健',
+    enName: 'Jia Weijian',
+    dept: 'MP 研发1',
+    position: 'MP 车身附件开发专业经理',
+    email: 'weijian.jia@svw.com',
+    phone: '13888880006',
+    phoneShort: '680006',
+    location: '上海总部-安亭',
+    gender: '男',
+    dob: '1989/03/25',
+    ethnicity: '汉族',
+    nativePlace: '湖北武汉',
+    birthplace: '武汉',
+    politicalStatus: '中共党员',
+    maritalStatus: '已婚',
+    startWorkDate: '2014/07/18',
+    title: '专业经理',
+    perf2024: 'A',
+    perf2023: 'B',
+    perf2022: 'B',
+    education: [
+      { school: '华中科技大学', major: '机械制造及其自动化', degree: '工学硕士', time: '2011/09 - 2014/07' }
+    ],
+    workHistory: [
+      { company: '上汽大众', time: '2014/07 ~ 至今', position: 'MP 车身附件开发专业经理', dept: 'MP 研发1' }
+    ]
   }
 };

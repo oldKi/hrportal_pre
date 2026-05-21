@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Search, ZoomIn, ZoomOut, RotateCcw, UserPlus } from 'lucide-react';
-import { PositionDetailDrawer } from './PositionDetailDrawer';
-import { PersonDetailDrawer } from './PersonDetailDrawer';
+// PositionDetailDrawer and PersonDetailDrawer removed to jump directly to personal profile
 import { MOCK_POSITIONS, PositionNode } from './mockData';
 
 const PosNode = ({ 
@@ -143,9 +142,15 @@ export const PositionArchitecture = ({ onNavigate, viewParams }: { onNavigate?: 
   const [currentRootId, setCurrentRootId] = useState('root');
   const [searchQuery, setSearchQuery] = React.useState('');
   const [zoom, setZoom] = React.useState(1);
-  const [selectedPosition, setSelectedPosition] = useState<any>(null);
-  const [selectedPerson, setSelectedPerson] = useState<any>(null);
   const [isExpanded, setIsExpanded] = useState(true);
+
+  const handleCardClick = (pos: any) => {
+    const id = pos.id;
+    const name = pos.occupant || pos.name;
+    if (id && name && name !== '待招募') {
+      onNavigate?.('personnel-details', { personId: id });
+    }
+  };
   const [expandedChildIds, setExpandedChildIds] = useState<Set<string>>(new Set());
 
   React.useEffect(() => {
@@ -233,8 +238,8 @@ export const PositionArchitecture = ({ onNavigate, viewParams }: { onNavigate?: 
             <PosNode 
               data={posData} 
               isRoot={true}
-              onClick={setSelectedPosition} 
-              onSelectPerson={setSelectedPerson}
+              onClick={handleCardClick} 
+              onSelectPerson={handleCardClick}
               onToggleExpand={() => setIsExpanded(!isExpanded)}
               isExpanded={isExpanded}
               onNavigate={onNavigate}
@@ -277,8 +282,8 @@ export const PositionArchitecture = ({ onNavigate, viewParams }: { onNavigate?: 
                     <PosNode 
                       data={child} 
                       level={1} 
-                      onClick={setSelectedPosition} 
-                      onSelectPerson={setSelectedPerson}
+                      onClick={handleCardClick} 
+                      onSelectPerson={handleCardClick}
                       onNavigate={onNavigate} 
                       isExpanded={expandedChildIds.has(child.id)}
                       onToggleExpand={() => toggleChildExpand(child.id)}
@@ -296,8 +301,8 @@ export const PositionArchitecture = ({ onNavigate, viewParams }: { onNavigate?: 
                                     <PosNode 
                                       data={MOCK_POSITIONS[gid]} 
                                       level={2} 
-                                      onClick={setSelectedPosition} 
-                                      onSelectPerson={setSelectedPerson}
+                                      onClick={handleCardClick} 
+                                      onSelectPerson={handleCardClick}
                                       onNavigate={onNavigate} 
                                     />
                                 </React.Fragment>
@@ -313,24 +318,7 @@ export const PositionArchitecture = ({ onNavigate, viewParams }: { onNavigate?: 
       </div>
 
 
-      {selectedPosition && (
-        <PositionDetailDrawer
-          isOpen={!!selectedPosition}
-          onClose={() => setSelectedPosition(null)}
-          position={selectedPosition}
-          onSelectPerson={(person: any) => setSelectedPerson(person)}
-          onNavigate={onNavigate}
-        />
-      )}
-
-      {selectedPerson && (
-        <PersonDetailDrawer
-          isOpen={!!selectedPerson}
-          onClose={() => setSelectedPerson(null)}
-          person={selectedPerson}
-          onNavigate={onNavigate}
-        />
-      )}
+      {/* Detail drawers removed to navigate directly to personal profiles */}
     </div>
   );
 };
