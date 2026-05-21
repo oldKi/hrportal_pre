@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Contact2, User, Search, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { PersonDetailDrawer } from './PersonDetailDrawer';
+import { PositionDetailDrawer } from './PositionDetailDrawer';
 import { MOCK_PEOPLE, MOCK_SUBORDINATES, MOCK_POSITIONS, MOCK_DEPARTMENTS, PersonNode } from './mockData';
 import { matchPinyin } from '../pinyinUtils';
 
@@ -9,6 +10,7 @@ const OrgCard = ({
   isManager = false, 
   onClick, 
   onIconClick,
+  onTitleClick,
   onToggleSub,
   isExpanded = true
 }: { 
@@ -16,6 +18,7 @@ const OrgCard = ({
   isManager?: boolean, 
   onClick?: (data: any) => void, 
   onIconClick?: (data: any) => void,
+  onTitleClick?: (data: PersonNode) => void,
   onToggleSub?: () => void,
   isExpanded?: boolean
 }) => {
@@ -42,7 +45,16 @@ const OrgCard = ({
             <span className="font-bold text-gray-900 text-[15px]">{data.name}</span>
             {data.enName && <span className="font-bold text-gray-800 text-[14px]">{data.enName}</span>}
           </div>
-          <div className="text-[12px] text-gray-400 mt-0.5 truncate">{data.title}</div>
+          <div 
+            className="text-[12px] text-gray-400 mt-0.5 truncate hover:text-blue-600 hover:underline cursor-pointer inline-block"
+            onClick={(e) => {
+              e.stopPropagation();
+              onTitleClick?.(data);
+            }}
+            title="查看岗位明细"
+          >
+            {data.title}
+          </div>
           {!isManager && data.count && (
             <div className="text-[11px] text-blue-500 font-bold mt-1.5 cursor-pointer hover:underline">
               {data.count}个直接下属
@@ -96,10 +108,84 @@ export const ReportingRelationship = ({
   const [visibleManagerCount, setVisibleManagerCount] = useState(1);
   const [isSubExpanded, setIsSubExpanded] = useState(true);
   const [selectedPerson, setSelectedPerson] = useState<any>(null);
+  const [selectedPosition, setSelectedPosition] = useState<any>(null);
   const [focusPerson, setFocusPerson] = useState<{ id: string; name: string } | null>(null);
 
   const handleNavigate = (view: string, params?: any) => {
     onNavigate?.(view, params);
+  };
+
+  const getPositionForPersonNode = (data: PersonNode): any => {
+    const foundPos = Object.values(MOCK_POSITIONS).find(
+      p => p.occupant && (p.occupant === data.name || p.occupant.includes(data.name) || data.name.includes(p.occupant))
+    );
+    if (foundPos) {
+      return foundPos;
+    }
+
+    let deptName = '大众汽车（中国）';
+    let costCenter = 'VGC-HQ (10000)';
+    let hrSubarea = '北京总部-VGC Beijing (9000)';
+    let hrArea = '大众中国 (VGC)';
+    let company = '大众汽车中国 (8000)';
+
+    for (const dept of Object.values(MOCK_DEPARTMENTS)) {
+      const hasPerson = dept.personnel?.some(p => p.id === data.id || p.name === data.name);
+      const isLeader = dept.leader?.includes(data.name) || dept.leaders?.some(l => l.name === data.name);
+      if (hasPerson || isLeader) {
+        deptName = dept.name;
+        costCenter = dept.costCenter || costCenter;
+        hrSubarea = dept.hrSubarea || hrSubarea;
+        hrArea = dept.hrArea || hrArea;
+        if (dept.hrArea?.includes('大众中国') || dept.id === 'corp') {
+          company = '大众汽车中国 (8000)';
+        } else {
+          company = '上汽大众 (8000)';
+        }
+        break;
+      }
+    }
+
+    const nameHash = data.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const codeVal = 60110000 + (nameHash % 9000);
+    const extIdVal = 50090000 + (nameHash % 9000);
+
+    const personInPeople = MOCK_PEOPLE.find(p => p.id === data.id || p.name === data.name);
+    const parentId = personInPeople?.parentId || data.parentId;
+    let parentPosId = undefined;
+    if (parentId) {
+      const parentPerson = MOCK_PEOPLE.find(p => p.id === parentId);
+      if (parentPerson) {
+        const foundParentPos = Object.values(MOCK_POSITIONS).find(
+          p => p.occupant && (p.occupant === parentPerson.name || p.occupant.includes(parentPerson.name))
+        );
+        if (foundParentPos) {
+          parentPosId = foundParentPos.id;
+        }
+      }
+    }
+
+    return {
+      id: data.id + '_pos',
+      department: deptName,
+      title: data.title,
+      occupant: data.name,
+      avatar: null,
+      parentId: parentPosId,
+      code: String(codeVal),
+      externalId: String(extIdVal),
+      effectiveDate: '2024 年 9 月 14 日',
+      standardPosition: `${data.title} (${codeVal})`,
+      company: company,
+      hrSubarea: hrSubarea,
+      hrArea: hrArea,
+      costCenter: costCenter,
+      personId: data.id
+    };
+  };
+
+  const handleTitleClick = (data: PersonNode) => {
+    setSelectedPosition(getPositionForPersonNode(data));
   };
 
   // Sync focusPerson from viewParams when navigated into
@@ -366,6 +452,7 @@ export const ReportingRelationship = ({
                   data={manager} 
                   isManager={true} 
                   onClick={setSelectedPerson} 
+                  onTitleClick={handleTitleClick}
                   isExpanded={manager.id === targetManager.id ? isSubExpanded : true}
                   onToggleSub={manager.id === targetManager.id ? () => setIsSubExpanded(!isSubExpanded) : undefined}
                   onIconClick={(data) => handleNavigate('personnel-details', { personId: data.id })}
@@ -396,6 +483,7 @@ export const ReportingRelationship = ({
                   data={sub} 
                   isManager={false} 
                   onClick={setSelectedPerson} 
+                  onTitleClick={handleTitleClick}
                   onIconClick={(data) => handleNavigate('personnel-details', { personId: data.id })}
                 />
               ))}
@@ -409,6 +497,19 @@ export const ReportingRelationship = ({
           isOpen={!!selectedPerson}
           onClose={() => setSelectedPerson(null)}
           person={selectedPerson}
+          onNavigate={handleNavigate}
+        />
+      )}
+
+      {selectedPosition && (
+        <PositionDetailDrawer
+          isOpen={!!selectedPosition}
+          onClose={() => setSelectedPosition(null)}
+          position={selectedPosition}
+          onSelectPerson={(person: any) => {
+            setSelectedPosition(null);
+            setSelectedPerson(person);
+          }}
           onNavigate={handleNavigate}
         />
       )}
