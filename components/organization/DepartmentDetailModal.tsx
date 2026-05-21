@@ -178,18 +178,12 @@ export const DepartmentDetailModal: React.FC<DepartmentDetailModalProps> = ({
             className="fixed top-0 right-0 z-[101] h-full w-[480px] bg-white shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 relative">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h2 className="text-gray-400 text-[13px] font-bold uppercase tracking-wider mb-1">部门详情</h2>
-                  <h1 className="text-lg font-bold text-gray-900">{dept.name}</h1>
-                  <p className="text-gray-500 text-sm">{dept.externalId} | {dept.code}</p>
-                </div>
-                <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
-                  <X size={24} />
-                </button>
-              </div>
+            <div className="p-4 border-b border-gray-100 flex justify-end relative">
+              <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+                <X size={24} />
+              </button>
             </div>
+
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
