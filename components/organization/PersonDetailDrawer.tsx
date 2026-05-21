@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, MapPin, Clock, Contact, Network, Camera, Info, Phone, Smartphone, Hash, Mail, Award, Calendar } from 'lucide-react';
+import { X, MapPin, Clock, Contact, Network, Info, Phone, Smartphone, Hash, Mail, Award, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface PersonDetailDrawerProps {
@@ -259,9 +259,6 @@ export const PersonDetailDrawer: React.FC<PersonDetailDrawerProps & { onNavigate
                       referrerPolicy="no-referrer"
                     />
                   </div>
-                  <button className="absolute bottom-1 right-1 bg-white p-1.5 rounded-full shadow-md text-blue-600 hover:bg-gray-50 transition-colors border border-gray-100">
-                    <Camera size={16} />
-                  </button>
                 </div>
               </div>
  

@@ -8,6 +8,8 @@ interface DepartmentDetailModalProps {
   onClose: () => void;
   department: any;
   onSelectPerson: (person: any) => void;
+  onSelectPosition?: (position: any) => void;
+  onNavigateToPositionTree?: (position: any) => void;
   defaultSection?: 'info' | 'personnel' | 'positions';
 }
 
@@ -91,7 +93,15 @@ const InfoRow = ({ label, required, value, icon }: { label: string; required?: b
   );
 };
 
-export const DepartmentDetailModal: React.FC<DepartmentDetailModalProps> = ({ isOpen, onClose, department, onSelectPerson, defaultSection = 'info' }) => {
+export const DepartmentDetailModal: React.FC<DepartmentDetailModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  department, 
+  onSelectPerson, 
+  onSelectPosition,
+  onNavigateToPositionTree,
+  defaultSection = 'info' 
+}) => {
   const [openSection, setOpenSection] = useState<string | null>(defaultSection);
 
   // Sync section if defaultSection changes (though usually modal re-mounts)
@@ -250,16 +260,28 @@ export const DepartmentDetailModal: React.FC<DepartmentDetailModalProps> = ({ is
               >
                 <div className="space-y-3">
                   {positions.length > 0 ? positions.map((pos: any) => (
-                    <div key={pos.id} className="p-3 bg-white border border-gray-100 rounded-lg shadow-sm">
-                      <div className="flex justify-between items-start mb-1">
-                        <span className="font-bold text-gray-800 text-sm">{pos.title}</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${pos.status === '已占' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
-                          {pos.status}
-                        </span>
+                    <div key={pos.id} className="p-3 bg-white border border-gray-100 rounded-lg shadow-sm flex items-center justify-between hover:border-blue-100 transition-colors">
+                      <div className="min-w-0 flex-1 pr-4">
+                        <div className="font-bold text-gray-800 text-sm truncate">{pos.title}</div>
+                        <div className="text-gray-400 text-xs mt-1 font-mono">{pos.code || pos.id}</div>
                       </div>
-                      <div className="text-gray-500 text-xs flex items-center gap-1">
-                        <User size={12} />
-                        {pos.occupant}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {/* 卡片进入明细 */}
+                        <button 
+                          onClick={() => onSelectPosition?.(pos)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 hover:text-blue-800 rounded-lg transition-colors flex items-center justify-center"
+                          title="查看职位明细"
+                        >
+                          <Contact size={18} />
+                        </button>
+                        {/* 组织汇报树形icon */}
+                        <button 
+                          onClick={() => onNavigateToPositionTree?.(pos)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 hover:text-blue-800 rounded-lg transition-colors flex items-center justify-center"
+                          title="进入组织架构树"
+                        >
+                          <Network size={18} />
+                        </button>
                       </div>
                     </div>
                   )) : <div className="text-gray-400 text-center py-4 italic">暂无职位数据</div>}

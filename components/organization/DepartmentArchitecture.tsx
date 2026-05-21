@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Users, User, Search, ZoomIn, ZoomOut, RotateCcw, LayoutGrid } from 'lucide-react';
 import { DepartmentDetailModal } from './DepartmentDetailModal';
 import { PersonDetailDrawer } from './PersonDetailDrawer';
-import { MOCK_DEPARTMENTS, DepartmentNode } from './mockData';
+import { PositionDetailDrawer } from './PositionDetailDrawer';
+import { MOCK_DEPARTMENTS, DepartmentNode, MOCK_POSITIONS } from './mockData';
 
 const DeptNode = ({ data, isRoot = false, onClick, onSelectPerson, onToggleExpand, isExpanded }: { data: DepartmentNode, isRoot?: boolean, onClick: (data: any, section?: any) => void, onSelectPerson: (person: any) => void, onToggleExpand?: () => void, isExpanded?: boolean }) => {
   return (
@@ -114,9 +115,74 @@ export const DepartmentArchitecture = ({ onNavigate }: { onNavigate?: (view: str
   const [zoom, setZoom] = React.useState(1);
   const [selectedDept, setSelectedDept] = useState<any>(null);
   const [modalSection, setModalSection] = useState<'info' | 'personnel' | 'positions'>('info');
+  const [selectedPosition, setSelectedPosition] = useState<any>(null);
   const [selectedPerson, setSelectedPerson] = useState<any>(null);
   const [isExpanded, setIsExpanded] = useState(true);
   const [expandedDeptIds, setExpandedDeptIds] = useState<Set<string>>(new Set());
+
+  const handleSelectPosition = (pos: any) => {
+    let detailedPos = null;
+    if (MOCK_POSITIONS[pos.id]) {
+      detailedPos = MOCK_POSITIONS[pos.id];
+    } else if (pos.occupant && pos.occupant !== '待招募') {
+      const matchKey = Object.keys(MOCK_POSITIONS).find(
+        key => MOCK_POSITIONS[key].occupant === pos.occupant
+      );
+      if (matchKey) {
+        detailedPos = MOCK_POSITIONS[matchKey];
+      }
+    }
+    
+    if (!detailedPos && pos.title) {
+      const matchKey = Object.keys(MOCK_POSITIONS).find(
+        key => MOCK_POSITIONS[key].title === pos.title
+      );
+      if (matchKey) {
+        detailedPos = MOCK_POSITIONS[matchKey];
+      }
+    }
+
+    if (!detailedPos) {
+      detailedPos = {
+        id: pos.id,
+        department: selectedDept?.name || '未知部门',
+        title: pos.title,
+        occupant: pos.occupant,
+        isEmpty: pos.status === '空缺' || pos.occupant === '待招募',
+        code: pos.code || pos.id,
+        effectiveDate: selectedDept?.effectiveDate || '2024 年 9 月 14 日',
+        standardPosition: `${pos.title} (${pos.id})`,
+        company: selectedDept?.hrArea || '上汽大众 (安亭) (0SVW)',
+        hrSubarea: selectedDept?.hrSubarea || '安亭本部-SVW Anting (9001)',
+        hrArea: selectedDept?.hrArea || '上汽大众 (安亭) (0SVW)',
+        costCenter: selectedDept?.costCenter || 'CI信息系统 (84000)',
+      };
+    }
+
+    setSelectedPosition(detailedPos);
+  };
+
+  const handleNavigateToPositionTree = (pos: any) => {
+    let targetId = 'root';
+    if (MOCK_POSITIONS[pos.id]) {
+      targetId = pos.id;
+    } else if (pos.occupant && pos.occupant !== '待招募') {
+      const matchKey = Object.keys(MOCK_POSITIONS).find(
+        key => MOCK_POSITIONS[key].occupant === pos.occupant
+      );
+      if (matchKey) targetId = matchKey;
+    } else if (pos.title) {
+      const matchKey = Object.keys(MOCK_POSITIONS).find(
+        key => MOCK_POSITIONS[key].title === pos.title
+      );
+      if (matchKey) targetId = matchKey;
+    }
+    
+    setSelectedDept(null);
+    if (onNavigate) {
+      onNavigate('organization-v2', { tab: 'position', positionId: targetId });
+    }
+  };
 
   const toggleDeptExpand = (id: string) => {
     setExpandedDeptIds(prev => {
@@ -293,6 +359,8 @@ export const DepartmentArchitecture = ({ onNavigate }: { onNavigate?: (view: str
           department={selectedDept} 
           defaultSection={modalSection}
           onSelectPerson={(person: any) => setSelectedPerson(person)}
+          onSelectPosition={handleSelectPosition}
+          onNavigateToPositionTree={handleNavigateToPositionTree}
         />
       )}
 
@@ -301,6 +369,16 @@ export const DepartmentArchitecture = ({ onNavigate }: { onNavigate?: (view: str
           isOpen={!!selectedPerson}
           onClose={() => setSelectedPerson(null)}
           person={selectedPerson}
+          onNavigate={onNavigate}
+        />
+      )}
+
+      {selectedPosition && (
+        <PositionDetailDrawer
+          isOpen={!!selectedPosition}
+          onClose={() => setSelectedPosition(null)}
+          position={selectedPosition}
+          onSelectPerson={(person: any) => setSelectedPerson(person)}
           onNavigate={onNavigate}
         />
       )}

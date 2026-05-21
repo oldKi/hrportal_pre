@@ -286,15 +286,12 @@ export const EmployeeProfileDetails: React.FC<{ personId?: string; onBack: () =>
                 </div>
 
                 <div className="px-6 pb-6 relative flex flex-col sm:flex-row gap-5 items-start sm:items-center -mt-10">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-slate-100 shrink-0 relative group">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-slate-100 shrink-0">
                     <img 
                       src={person.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200"} 
                       alt={person.name} 
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs cursor-pointer transition-opacity">
-                      更换照片
-                    </div>
                   </div>
 
                   <div className="flex-1 space-y-2 mt-8 sm:mt-10">

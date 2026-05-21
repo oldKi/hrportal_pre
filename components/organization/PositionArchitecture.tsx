@@ -139,7 +139,7 @@ const PosNode = ({
   );
 };
 
-export const PositionArchitecture = ({ onNavigate }: { onNavigate?: (view: string, params?: any) => void }) => {
+export const PositionArchitecture = ({ onNavigate, viewParams }: { onNavigate?: (view: string, params?: any) => void, viewParams?: any }) => {
   const [currentRootId, setCurrentRootId] = useState('root');
   const [searchQuery, setSearchQuery] = React.useState('');
   const [zoom, setZoom] = React.useState(1);
@@ -147,6 +147,12 @@ export const PositionArchitecture = ({ onNavigate }: { onNavigate?: (view: strin
   const [selectedPerson, setSelectedPerson] = useState<any>(null);
   const [isExpanded, setIsExpanded] = useState(true);
   const [expandedChildIds, setExpandedChildIds] = useState<Set<string>>(new Set());
+
+  React.useEffect(() => {
+    if (viewParams?.positionId && MOCK_POSITIONS[viewParams.positionId]) {
+      setCurrentRootId(viewParams.positionId);
+    }
+  }, [viewParams?.positionId]);
 
   const toggleChildExpand = (id: string) => {
     setExpandedChildIds(prev => {

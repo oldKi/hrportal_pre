@@ -48,7 +48,7 @@ export const OrganizationV2 = ({ initialTab, onNavigate, viewParams }: { initial
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
         {activeTab === 'department' && <DepartmentArchitecture onNavigate={onNavigate} />}
-        {activeTab === 'position' && <PositionArchitecture onNavigate={onNavigate} />}
+        {activeTab === 'position' && <PositionArchitecture onNavigate={onNavigate} viewParams={viewParams} />}
         {activeTab === 'reporting' && <ReportingRelationship onNavigate={onNavigate} viewParams={viewParams} />}
       </div>
     </div>
