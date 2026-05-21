@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Heart, 
   GitMerge, 
@@ -32,7 +32,9 @@ import {
   Monitor,
   AppWindow,
   List,
-  Smartphone
+  Smartphone,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 
@@ -189,6 +191,8 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('全部');
     const [viewType, setViewType] = useState<'card' | 'table'>('card');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
     
     // Force manage mode if mode is 'admin'
     const isManageMode = mode === 'admin';
@@ -227,6 +231,15 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
 
     // Sort apps: favorites first
     const sortedApps = [...filteredApps].sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
+
+    // Reset to page 1 on search or category filter change or page size change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, activeCategory, pageSize]);
+
+    const totalPages = Math.ceil(sortedApps.length / pageSize);
+    const safeCurrentPage = Math.min(currentPage, totalPages || 1);
+    const paginatedApps = sortedApps.slice((safeCurrentPage - 1) * pageSize, safeCurrentPage * pageSize);
 
     const handleOpenApp = (app: AppItem) => {
         if (isManageMode) return;
@@ -357,7 +370,7 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
             {/* Apps Content */}
             {viewType === 'card' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    {sortedApps.map(app => (
+                    {paginatedApps.map(app => (
                         <div 
                             key={app.id}
                             onClick={() => handleOpenApp(app)}
@@ -427,7 +440,7 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {sortedApps.map(app => (
+                                {paginatedApps.map(app => (
                                     <tr 
                                         key={app.id} 
                                         onClick={() => handleOpenApp(app)}
@@ -541,6 +554,51 @@ export const AppCenter: React.FC<{ mode?: 'user' | 'admin' }> = ({ mode = 'admin
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            )}
+
+            {filteredApps.length > 0 && (
+                <div className="p-4 bg-white border border-gray-150 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 select-none">
+                    <div className="text-sm text-gray-500">
+                        共 <span className="font-bold text-gray-800">{filteredApps.length}</span> 个应用，当前显示第 <span className="font-bold text-gray-800">{(safeCurrentPage - 1) * pageSize + 1}</span> 到 <span className="font-bold text-gray-800">{Math.min(safeCurrentPage * pageSize, filteredApps.length)}</span> 个
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-400">每页显示</span>
+                            <select 
+                                value={pageSize}
+                                onChange={(e) => {
+                                    setPageSize(Number(e.target.value));
+                                }}
+                                className="bg-white border border-gray-250 rounded-lg px-2.5 py-1 text-xs outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                            >
+                                {[5, 10, 20, 50].map(size => <option key={size} value={size}>{size} 条</option>)}
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <button 
+                                type="button"
+                                disabled={safeCurrentPage === 1}
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                className="p-1.5 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-blue-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all flex items-center justify-center cursor-pointer"
+                                title="上一页"
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
+                            <div className="flex items-center px-3 text-sm font-bold text-gray-700">
+                                {safeCurrentPage} / {totalPages || 1}
+                            </div>
+                            <button 
+                                type="button"
+                                disabled={safeCurrentPage === totalPages || totalPages === 0}
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                className="p-1.5 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-blue-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all flex items-center justify-center cursor-pointer"
+                                title="下一页"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
